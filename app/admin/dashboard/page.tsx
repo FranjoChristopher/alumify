@@ -657,7 +657,7 @@ export default function AdminDashboard() {
             
             <iframe
               id="analyticsIframe"
-              src="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/?embed=true&show_toolbar=false"
+              src="https://symmetrical-space-invention-pjpjppqpq6p5367q7-8501.app.github.dev/"
               className="w-full h-full border-0"
               onLoad={() => {
                 document.getElementById('loadingIndicator').style.display = 'none';
