@@ -635,9 +635,12 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent className={isFullScreen ? "h-[calc(100vh-80px)] p-0" : "h-[600px] p-0"}>
                   <iframe
-                    src="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/?embed_options=show_toolbar,show_padding,show_footer,dark_theme,disable_scrolling,light_theme,show_colored_line" // Streamlit URL
+                    src="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/"
                     style={{ width: "100%", height: "100%", border: "none" }}
                     title="Streamlit Dashboard"
+                    // Add referrer policy and sandbox
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    sandbox="allow-scripts allow-same-origin allow-forms"
                   />
                 </CardContent>
               </Card>
