@@ -220,10 +220,10 @@ class AlumifyDashboard:
         """Create database connection"""
         try:
             conn = mysql.connector.connect(
-                host='127.0.0.1',
-                user='root',
-                password='',
-                database='alumify',
+                host='srv2050.hstgr.io',
+                user='u185173985_alumify2025',
+                password='Alumify..2025',
+                database='u185173985_alumify2025',
                 autocommit=True
             )
             return conn
