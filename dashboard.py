@@ -772,27 +772,27 @@ export default function AdminDashboard() {
                                 <Button variant="outline" size="sm" onClick={() => handleGenerateReport(alumni.id)}>
                                   <FileDown className="h-4 w-4" />
                                 </Button>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button variant="outline" size="sm">
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Delete Alumni Profile</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Are you sure you want to delete {alumni.name}'s profile? This action cannot be undone.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                      <AlertDialogAction onClick={() => handleDeleteAlumni(alumni.id)}>
-                                        Delete
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button variant="outline" size="sm">
+      <Trash2 className="h-4 w-4" />
+    </Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Delete Alumni Profile</AlertDialogTitle>
+      <AlertDialogDescription>
+        Are you sure you want to delete {alumni.name}'s profile? This action cannot be undone.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction onClick={() => handleDeleteAlumni(alumni.id)}>
+        Delete
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
                               </div>
                             </TableCell>
                           </TableRow>
