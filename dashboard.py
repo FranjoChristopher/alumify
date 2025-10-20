@@ -5,7 +5,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
-from streamlit.web.server.websocket_headers import _get_websocket_headers
 import mysql.connector
 import warnings
 import io
@@ -221,10 +220,14 @@ def create_connection(self):
 """Create database connection"""
 try:
 conn = mysql.connector.connect(
-host='srv2050.hstgr.io',
-user='u185173985_alumify2025',
-password='Alumify..2025',
-database='u185173985_alumify2025',
+                host='127.0.0.1',
+                user='root',
+                password='',
+                database='alumify',
+                host='srv2050.hstgr.io',
+                user='u185173985_alumify2025',
+                password='Alumify..2025',
+                database='u185173985_alumify2025',
 autocommit=True
 )
 return conn
@@ -1044,4 +1047,5 @@ datetime.now().strftime("%Y-%m-%d %H:%M")
 ))
 
 if __name__ == "__main__":
-main()
+    main()
+    main()
