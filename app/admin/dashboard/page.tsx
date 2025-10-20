@@ -610,36 +610,39 @@ Logout
 </TabsList>
 
 <TabsContent value="analytics" className="space-y-6">
-<Card>
-<CardHeader>
-<CardTitle>Analytics Dashboard</CardTitle>
-</CardHeader>
-<CardContent>
-<div className="text-center py-12">
-<TrendingUp className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-<h3 className="text-xl font-semibold mb-2">Interactive Analytics</h3>
-<p className="text-gray-600 mb-6 max-w-md mx-auto">
-Access detailed analytics and insights through our interactive dashboard.
-</p>
-<div className="flex gap-4 justify-center">
-<Button asChild>
-<a 
-href="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/" 
-target="_blank" 
-rel="noopener noreferrer"
+{/* Streamlit Dashboard Card */}
+<Card className={isFullScreen ? "fixed inset-0 z-50 m-0 p-0 w-screen h-screen" : "col-span-2"}>
+<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+<CardTitle>Insights</CardTitle>
+<Button
+variant="outline"
+size="sm"
+onClick={() => setIsFullScreen(!isFullScreen)}
 className="flex items-center gap-2"
 >
+{isFullScreen ? (
+<>
+<Minimize2 className="h-4 w-4" />
+Exit Fullscreen
+</>
+) : (
+<>
 <Maximize2 className="h-4 w-4" />
-              Open Dashboard
-              Open Dashboard in New Tab
-</a>
+Fullscreen
+</>
+)}
 </Button>
-<Button variant="outline" onClick={fetchAllData}>
-<RefreshCw className="h-4 w-4 mr-2" />
-Refresh Data
-</Button>
-</div>
-</div>
+</CardHeader>
+<CardContent className={isFullScreen ? "h-[calc(100vh-80px)] p-0" : "h-[600px] p-0"}>
+<iframe
+                    src="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/?embed_options=show_toolbar,show_padding,show_footer,dark_theme,disable_scrolling,light_theme,show_colored_line" // Streamlit URL
+                    src="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/"
+style={{ width: "100%", height: "100%", border: "none" }}
+title="Streamlit Dashboard"
+                    // Add referrer policy and sandbox
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    sandbox="allow-scripts allow-same-origin allow-forms"
+/>
 </CardContent>
 </Card>
 </TabsContent>
