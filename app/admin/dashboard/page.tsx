@@ -42,15 +42,12 @@ import {
   Settings,
   Save,
   Maximize2,
-  ExternalLink,
-  AlertCircle,
-  BarChart,
-  Briefcase,
+  Minimize2,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import {
-  BarChart as RechartsBarChart,
+  BarChart,
   Bar,
   XAxis,
   YAxis,
@@ -89,6 +86,8 @@ export default function AdminDashboard() {
   const [activityCount, setActivityCount] = useState<number>(10)
   const [activityStartDate, setActivityStartDate] = useState<string>('')
   const [activityEndDate, setActivityEndDate] = useState<string>('')
+  // Add state for fullscreen iframe
+  const [isFullScreen, setIsFullScreen] = useState(false)
   // Add state for survey dialog
   const [showSurveyDialog, setShowSurveyDialog] = useState(false)
   const [surveyData, setSurveyData] = useState<any>(null)
@@ -106,6 +105,18 @@ export default function AdminDashboard() {
 
     fetchAllData()
   }, [router])
+
+  // Add useEffect to handle ESC key to exit fullscreen
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullScreen) {
+        setIsFullScreen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isFullScreen])
 
   const fetchAllData = async () => {
     setRefreshing(true)
@@ -598,92 +609,39 @@ export default function AdminDashboard() {
               <TabsTrigger value="trends">Trends</TabsTrigger>
             </TabsList>
 
-            {/* FIXED ANALYTICS TAB - No iframe */}
             <TabsContent value="analytics" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Advanced Analytics Dashboard</CardTitle>
-                  <CardDescription>
-                    Access comprehensive analytics and insights through our interactive dashboard
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8 space-y-6">
-                    {/* Dashboard Preview */}
-                    <div className="border-2 border-dashed border-blue-200 rounded-lg p-8 bg-blue-50 mx-auto max-w-2xl">
-                      <BarChart3 className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Interactive Analytics Dashboard</h3>
-                      <p className="text-gray-600 mb-4">
-                        Real-time insights into alumni employment, program performance, and engagement metrics
-                      </p>
-                      <div className="text-sm text-blue-600 font-medium">
-                        Opens in new window for optimal experience
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                      <Button 
-                        onClick={() => window.open('https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/', '_blank')}
-                        size="lg" 
-                        className="flex items-center gap-2"
-                      >
-                        <TrendingUp className="h-5 w-5" />
-                        Launch Analytics Dashboard
-                      </Button>
-                      
-                      <Button variant="outline" onClick={fetchAllData} className="flex items-center gap-2">
-                        <RefreshCw className="h-4 w-4" />
-                        Refresh Local Data
-                      </Button>
-                    </div>
-
-                    {/* Quick Stats Preview */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                      <Card className="p-4 text-center">
-                        <div className="text-2xl font-bold text-blue-600">{analytics?.overview?.total_users || 0}</div>
-                        <div className="text-sm text-gray-600">Total Alumni</div>
-                      </Card>
-                      <Card className="p-4 text-center">
-                        <div className="text-2xl font-bold text-green-600">
-                          {Math.round((analytics?.overview?.completed_surveys / analytics?.overview?.total_users) * 100) || 0}%
-                        </div>
-                        <div className="text-sm text-gray-600">Survey Completion</div>
-                      </Card>
-                      <Card className="p-4 text-center">
-                        <div className="text-2xl font-bold text-purple-600">{analytics?.overview?.employment_rate || 0}%</div>
-                        <div className="text-sm text-gray-600">Employment Rate</div>
-                      </Card>
-                      <Card className="p-4 text-center">
-                        <div className="text-2xl font-bold text-orange-600">{recentActivities.length}</div>
-                        <div className="text-sm text-gray-600">Recent Activities</div>
-                      </Card>
-                    </div>
-
-                    {/* Features Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                      <Card className="p-6 text-center">
-                        <Users className="h-8 w-8 text-blue-500 mx-auto mb-3" />
-                        <h4 className="font-semibold mb-2">Alumni Demographics</h4>
-                        <p className="text-sm text-gray-600">Detailed breakdown by program, graduation year, and location</p>
-                      </Card>
-                      <Card className="p-6 text-center">
-                        <Briefcase className="h-8 w-8 text-green-500 mx-auto mb-3" />
-                        <h4 className="font-semibold mb-2">Employment Analytics</h4>
-                        <p className="text-sm text-gray-600">Employment rates, industry placement, and career progression</p>
-                      </Card>
-                      <Card className="p-6 text-center">
-                        <BarChart className="h-8 w-8 text-purple-500 mx-auto mb-3" />
-                        <h4 className="font-semibold mb-2">Program Performance</h4>
-                        <p className="text-sm text-gray-600">Compare program outcomes and success metrics over time</p>
-                      </Card>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Rest of your existing tabs remain the same */}
+  <Card>
+    <CardHeader>
+      <CardTitle>Analytics Dashboard</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="text-center py-12">
+        <TrendingUp className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+        <h3 className="text-xl font-semibold mb-2">Interactive Analytics</h3>
+        <p className="text-gray-600 mb-6 max-w-md mx-auto">
+          Access detailed analytics and insights through our interactive dashboard.
+        </p>
+        <div className="flex gap-4 justify-center">
+          <Button asChild>
+            <a 
+              href="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2"
+            >
+              <Maximize2 className="h-4 w-4" />
+              Open Dashboard
+            </a>
+          </Button>
+          <Button variant="outline" onClick={fetchAllData}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh Data
+          </Button>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+</TabsContent>
             <TabsContent value="alumni" className="space-y-6">
               <Card>
                 <CardHeader>
