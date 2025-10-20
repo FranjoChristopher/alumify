@@ -5,6 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
+from streamlit.web.server.websocket_headers import _get_websocket_headers
 import mysql.connector
 import warnings
 import io
