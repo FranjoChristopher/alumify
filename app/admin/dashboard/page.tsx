@@ -624,7 +624,7 @@ export default function AdminDashboard() {
         <div className="flex gap-4 justify-center">
           <Button asChild>
             <a 
-              href="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/" 
+              href="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/?" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2"
