@@ -649,146 +649,61 @@ const [analytics, setAnalytics] = useState<any>(null)
 </TabsList>
 
 <TabsContent value="analytics" className="space-y-6">
-{/* Streamlit Dashboard Card */}
-<Card className={isFullScreen ? "fixed inset-0 z-50 m-0 p-0 w-screen h-screen" : "col-span-2"}>
-<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-<CardTitle>Insights</CardTitle>
-<Button
-variant="outline"
-<Card>
-<CardHeader>
-<CardTitle>Analytics Dashboard</CardTitle>
-</CardHeader>
-<CardContent>
-<div className="space-y-6">
-{/* Dashboard Embed Section */}
-<div className="border rounded-lg overflow-hidden bg-gray-50">
-<div className="bg-white border-b p-4 flex justify-between items-center">
-<h3 className="font-semibold">Live Analytics Dashboard</h3>
-<div className="flex gap-2">
-<Button 
-variant="outline" 
-size="sm"
-onClick={() => setIsFullScreen(!isFullScreen)}
-className="flex items-center gap-2"
-onClick={() => {
-const iframe = document.getElementById('analyticsIframe');
-if (iframe) iframe.src = iframe.src;
-}}
->
-<RefreshCw className="h-4 w-4" />
-</Button>
-<Button 
-variant="outline" 
-size="sm"
-onClick={() => {
-const iframe = document.getElementById('analyticsIframe');
-if (iframe?.requestFullscreen) {
-iframe.requestFullscreen();
-}
-}}
->
-{isFullScreen ? (
-<>
-<Minimize2 className="h-4 w-4" />
-Exit Fullscreen
-</>
-) : (
-<>
-<Maximize2 className="h-4 w-4" />
-Fullscreen
-</>
-)}
-</Button>
-</CardHeader>
-<CardContent className={isFullScreen ? "h-[calc(100vh-80px)] p-0" : "h-[600px] p-0"}>
-</div>
-</div>
-
-{/* Embedded Dashboard */}
-<div className="relative" style={{ height: '600px' }}>
-<div className="absolute inset-0 flex items-center justify-center" id="loadingIndicator">
-<div className="text-center">
-<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-<p className="text-sm text-gray-600">Loading dashboard...</p>
-</div>
-</div>
-
-<iframe
-                    src="https://symmetrical-space-invention-pjpjppqpq6p5367q7-8501.app.github.dev/" // Streamlit URL
-                    src="https://symmetrical-space-invention-pjpjppqpq6p5367q7-8501.app.github.dev/"
-style={{ width: "100%", height: "100%", border: "none" }}
-title="Streamlit Dashboard"
-                    // Add referrer policy and sandbox
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    sandbox="allow-scripts allow-same-origin allow-forms"
-id="analyticsIframe"
-              src="https://symmetrical-space-invention-pjpjppqpq6p5367q7-8501.app.github.dev/"
-              src="https://symmetrical-space-invention-pjpjppqpq6p5367q7-8501.app.github.dev/"
-className="w-full h-full border-0"
-onLoad={() => {
-document.getElementById('loadingIndicator').style.display = 'none';
-}}
-onError={() => {
-const loader = document.getElementById('loadingIndicator');
-loader.innerHTML = `
-                 <div class="text-center p-4">
-                   <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
-                   <h4 class="font-semibold text-red-600">Failed to load dashboard</h4>
-                   <p class="text-sm text-gray-600 mb-3">Please try opening in a new tab</p>
-                   <Button onClick="window.open('https://symmetrical-space-invention-pjpjppqpq6p5367q7-8501.app.github.dev/', '_blank')">
-                     Open in New Tab
-                   </Button>
-                 </div>
-               `;
-}}
-allow="fullscreen"
-loading="lazy"
-/>
-</div>
-</div>
-
-{/* Action Buttons */}
-<div className="flex gap-4 justify-center pt-4">
-<Button asChild>
-<a 
-href="https://symmetrical-space-invention-pjpjppqpq6p5367q7-8501.app.github.dev/?embed=true" 
-target="_blank" 
-rel="noopener noreferrer"
-className="flex items-center gap-2"
->
-<ExternalLink className="h-4 w-4" />
-Open Full Dashboard
-</a>
-</Button>
-<Button variant="outline" onClick={fetchAllData}>
-<RefreshCw className="h-4 w-4 mr-2" />
-Refresh Data
-</Button>
-</div>
-
-{/* Quick Stats Preview */}
-<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-<Card className="p-4 text-center">
-<div className="text-2xl font-bold text-blue-600">{/* Add your stat here */}</div>
-<div className="text-sm text-gray-600">Total Alumni</div>
-</Card>
-<Card className="p-4 text-center">
-<div className="text-2xl font-bold text-green-600">{/* Add your stat here */}</div>
-<div className="text-sm text-gray-600">Employed</div>
-</Card>
-<Card className="p-4 text-center">
-<div className="text-2xl font-bold text-purple-600">{/* Add your stat here */}</div>
-<div className="text-sm text-gray-600">Surveys Completed</div>
-</Card>
-<Card className="p-4 text-center">
-<div className="text-2xl font-bold text-orange-600">{/* Add your stat here */}</div>
-<div className="text-sm text-gray-600">Active Users</div>
-</Card>
-</div>
-</div>
-</CardContent>
-</Card>
+  <Card>
+    <CardHeader>
+      <CardTitle>Analytics Dashboard</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="text-center py-12">
+        <TrendingUp className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+        <h3 className="text-xl font-semibold mb-2">Interactive Analytics Dashboard</h3>
+        <p className="text-gray-600 mb-6 max-w-md mx-auto">
+          Access detailed analytics and insights through our interactive dashboard.
+          Click the button below to open the dashboard in a new tab.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <Button asChild size="lg">
+            <a 
+              href="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2"
+            >
+              <Maximize2 className="h-4 w-4" />
+              Open Analytics Dashboard
+            </a>
+          </Button>
+          <Button variant="outline" onClick={fetchAllData}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh Data
+          </Button>
+        </div>
+        
+        {/* Alternative dashboard options */}
+        <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+          <h4 className="font-semibold text-blue-900 mb-2">Troubleshooting</h4>
+          <p className="text-sm text-blue-700 mb-3">
+            If the dashboard doesn't load, it might be temporarily unavailable.
+          </p>
+          <div className="flex flex-wrap gap-2 justify-center">
+            <Button variant="outline" size="sm" asChild>
+              <a 
+                href="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                Try Direct Link
+              </a>
+            </Button>
+            <Button variant="outline" size="sm" onClick={fetchAllData}>
+              <RefreshCw className="h-3 w-3 mr-1" />
+              Retry
+            </Button>
+          </div>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
 </TabsContent>
 
             <TabsContent value="alumni" className="space-y-6">
