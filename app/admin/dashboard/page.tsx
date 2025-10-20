@@ -630,7 +630,7 @@ export default function AdminDashboard() {
               className="flex items-center gap-2"
             >
               <Maximize2 className="h-4 w-4" />
-              Open Dashboard
+              Open Dashboard in New Tab
             </a>
           </Button>
           <Button variant="outline" onClick={fetchAllData}>
@@ -642,7 +642,6 @@ export default function AdminDashboard() {
     </CardContent>
   </Card>
 </TabsContent>
-
             <TabsContent value="alumni" className="space-y-6">
               <Card>
                 <CardHeader>
