@@ -612,38 +612,82 @@ export default function AdminDashboard() {
             <TabsContent value="analytics" className="space-y-6">
               {/* Streamlit Dashboard Card */}
               <Card className={isFullScreen ? "fixed inset-0 z-50 m-0 p-0 w-screen h-screen" : "col-span-2"}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle>Insights</CardTitle>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsFullScreen(!isFullScreen)}
-                    className="flex items-center gap-2"
-                  >
-                    {isFullScreen ? (
-                      <>
-                        <Minimize2 className="h-4 w-4" />
-                        Exit Fullscreen
-                      </>
-                    ) : (
-                      <>
-                        <Maximize2 className="h-4 w-4" />
-                        Fullscreen
-                      </>
-                    )}
-                  </Button>
-                </CardHeader>
-                <CardContent className={isFullScreen ? "h-[calc(100vh-80px)] p-0" : "h-[600px] p-0"}>
-                  <iframe
-                    src="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/"
-                    style={{ width: "100%", height: "100%", border: "none" }}
-                    title="Streamlit Dashboard"
-                    // Add referrer policy and sandbox
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    sandbox="allow-scripts allow-same-origin allow-forms"
-                  />
-                </CardContent>
-              </Card>
+  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <CardTitle>Insights</CardTitle>
+    <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          if (isFullScreen) {
+            setIsFullScreen(false)
+          } else {
+            // Refresh the iframe when entering fullscreen
+            setIframeKey(prev => prev + 1)
+            setIsFullScreen(true)
+          }
+        }}
+        className="flex items-center gap-2"
+      >
+        {isFullScreen ? (
+          <>
+            <Minimize2 className="h-4 w-4" />
+            Exit Fullscreen
+          </>
+        ) : (
+          <>
+            <Maximize2 className="h-4 w-4" />
+            Fullscreen
+          </>
+        )}
+      </Button>
+    </div>
+  </CardHeader>
+  <CardContent className={isFullScreen ? "h-[calc(100vh-80px)] p-0" : "h-[600px] p-0"}>
+    {iframeError ? (
+      <div className="flex flex-col items-center justify-center h-full space-y-4 p-8">
+        <BarChart3 className="h-16 w-16 text-gray-400" />
+        <h3 className="text-lg font-semibold text-gray-900">Dashboard Unavailable</h3>
+        <p className="text-gray-500 text-center">
+          The analytics dashboard is currently unavailable. This may be due to temporary service issues.
+        </p>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setIframeError(false)
+              setIframeKey(prev => prev + 1)
+            }}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Retry
+          </Button>
+          <Button asChild>
+            <a 
+              href="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open Directly
+            </a>
+          </Button>
+        </div>
+      </div>
+    ) : (
+      <iframe
+        key={iframeKey}
+        src={`https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/?embed=true&embed_options=dark_theme&show_toolbar=false`}
+        style={{ width: "100%", height: "100%", border: "none" }}
+        title="Streamlit Dashboard"
+        referrerPolicy="strict-origin-when-cross-origin"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+        loading="lazy"
+        onError={() => setIframeError(true)}
+        onLoad={() => setIframeError(false)}
+      />
+    )}
+  </CardContent>
+</Card>
             </TabsContent>
 
             <TabsContent value="alumni" className="space-y-6">
