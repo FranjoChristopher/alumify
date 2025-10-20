@@ -254,6 +254,23 @@ class AlumifyDashboard:
             # Load educational background
             self.education_df = pd.read_sql("SELECT * FROM educational_background", self.connection)
             
+            # Clean graduation years: remove invalid years and convert to proper integers
+            if 'year_graduated' in self.education_df.columns:
+                # Replace 0, 0000, and other invalid years with NaN
+                self.education_df['year_graduated'] = self.education_df['year_graduated'].replace([0, '0', '0000', ''], np.nan)
+                
+                # Convert to numeric, coercing errors to NaN
+                self.education_df['year_graduated'] = pd.to_numeric(self.education_df['year_graduated'], errors='coerce')
+                
+                # Filter out unrealistic years (before 1950 or after current year + 5)
+                current_year = datetime.now().year
+                self.education_df['year_graduated'] = self.education_df['year_graduated'].apply(
+                    lambda x: x if (pd.notna(x) and 1950 <= x <= current_year + 5) else np.nan
+                )
+                
+                # Convert to Int64 (nullable integer) to remove decimals
+                self.education_df['year_graduated'] = self.education_df['year_graduated'].astype('Int64')
+            
             # Load employment data
             self.employment_df = pd.read_sql("SELECT * FROM employment_data", self.connection)
             
@@ -306,7 +323,7 @@ class AlumifyDashboard:
         self.merged_df = merged
 
 def create_enhanced_filters(dashboard):
-    """Create enhanced filters with clear visual hierarchy"""
+    """Create enhanced filters with dynamic year range based on available data"""
     st.sidebar.markdown("### Dashboard Controls")
     
     # Refresh button with better styling
@@ -340,21 +357,35 @@ def create_enhanced_filters(dashboard):
         label_visibility="collapsed"
     )
     
-    # Graduation year with range slider - FIXED: Ensure integer values
+    # Dynamic Graduation Year Range - ONLY SHOWS AVAILABLE YEARS
     st.sidebar.markdown("**Graduation Years**")
-    years = sorted(dashboard.education_df['year_graduated'].dropna().unique().tolist())
-    # Convert years to integers to remove decimals
-    years = [int(year) for year in years if pd.notna(year)]
-    if years:
-        year_range = st.sidebar.slider(
+    
+    # Get available years from the database (already cleaned in load_data)
+    available_years = dashboard.education_df['year_graduated'].dropna().unique().tolist()
+    
+    if available_years:
+        # Convert to integers and sort
+        available_years = sorted([int(year) for year in available_years if pd.notna(year)])
+        
+        # Create year options for the slider - only available years
+        year_options = available_years
+        
+        # Set default range (min and max of available years)
+        default_min = min(available_years)
+        default_max = max(available_years)
+        
+        # Use select_slider to only allow available years
+        year_range = st.sidebar.select_slider(
             "Select Year Range:",
-            min_value=min(years),
-            max_value=max(years),
-            value=(min(years), max(years)),
+            options=year_options,
+            value=(default_min, default_max),
             label_visibility="collapsed"
         )
     else:
-        year_range = (2020, 2025)
+        # Fallback if no years available
+        current_year = datetime.now().year
+        year_range = (current_year - 5, current_year)
+        st.sidebar.warning("No graduation years found in database")
     
     # Demographic filters
     st.sidebar.markdown("**Demographics**")
@@ -382,7 +413,7 @@ def apply_enhanced_filters(dashboard, filters):
     if 'All Programs' not in filters['programs'] and filters['programs']:
         filtered_df = filtered_df[filtered_df['degree'].isin(filters['programs'])]
     
-    # Apply year range filter - FIXED: Ensure integer comparison
+    # Apply year range filter - using exact year matching from available years
     filtered_df = filtered_df[
         (filtered_df['year_graduated'] >= filters['year_range'][0]) & 
         (filtered_df['year_graduated'] <= filters['year_range'][1])
@@ -401,8 +432,8 @@ def apply_enhanced_filters(dashboard, filters):
 def generate_ai_narrative(dashboard, filtered_df, filters):
     """Generate AI-assisted narrative text based on current filters and data"""
     
-    # Calculate key metrics for narrative - FIXED: Use actual total alumni count (excluding admin)
-    total_alumni = len(dashboard.users_df)  # Already excludes admin
+    # Calculate key metrics for narrative
+    total_alumni = len(dashboard.users_df)
     filtered_alumni = len(filtered_df)
     employed_count = len(filtered_df[filtered_df['is_employed'] == 'Yes'])
     employment_rate = (employed_count / filtered_alumni) * 100 if filtered_alumni > 0 else 0
@@ -413,7 +444,7 @@ def generate_ai_narrative(dashboard, filtered_df, filters):
     else:
         program_text = "all programs"
     
-    # Year range text - FIXED: Remove decimals from year display
+    # Year range text
     year_start = int(filters['year_range'][0])
     year_end = int(filters['year_range'][1])
     year_text = f"from <span class='plotly-primary'>{year_start}</span> to <span class='plotly-primary'>{year_end}</span>"
@@ -439,13 +470,13 @@ def create_strategic_kpi_metrics(dashboard, filtered_df):
     """Create KPI metrics following strategic design principles"""
     st.markdown('<div class="main-header">Alumify Strategic Dashboard</div>', unsafe_allow_html=True)
     
-    # Calculate strategic metrics - FIXED: Use correct counts (excluding admin)
-    total_alumni = len(dashboard.users_df)  # Already excludes admin
+    # Calculate strategic metrics
+    total_alumni = len(dashboard.users_df)
     filtered_alumni = len(filtered_df)
     employed_count = len(filtered_df[filtered_df['is_employed'] == 'Yes'])
     employment_rate = (employed_count / filtered_alumni) * 100 if filtered_alumni > 0 else 0
     
-    # FIXED: Survey completion based on actual survey responses (excluding admin)
+    # Survey completion based on actual survey responses
     completed_surveys = len(dashboard.survey_df[dashboard.survey_df['is_completed'] == 1])
     survey_completion_rate = (completed_surveys / total_alumni) * 100 if total_alumni > 0 else 0
     
@@ -606,9 +637,11 @@ def create_plotly_enhanced_visualizations(dashboard, filtered_df, filters):
     with col3:
         st.markdown('<div class="subsection-header">Graduation Timeline</div>', unsafe_allow_html=True)
         if not filtered_df.empty and 'year_graduated' in filtered_df.columns:
-            # FIXED: Ensure years are integers and remove NaN values
+            # Use only valid, cleaned years
             grad_data = filtered_df[['year_graduated']].dropna()
             if not grad_data.empty:
+                # Ensure years are integers
+                grad_data = grad_data[grad_data['year_graduated'] >= 1950]  # Additional safety check
                 grad_data['year_graduated'] = grad_data['year_graduated'].astype(int)
                 grad_trend = grad_data['year_graduated'].value_counts().sort_index()
                 
@@ -630,7 +663,7 @@ def create_plotly_enhanced_visualizations(dashboard, filtered_df, filters):
                         line=dict(width=3),
                         hovertemplate='<b>Year: %{x}</b><br>Graduates: %{y}<extra></extra>'
                     )
-                    # FIXED: Format x-axis to show integers without decimals
+                    # Ensure x-axis shows integers without decimals
                     fig.update_xaxes(tickformat='d')
                     st.plotly_chart(fig, use_container_width=True)
                     
@@ -698,7 +731,7 @@ def create_actionable_insights(dashboard, filtered_df):
     filtered_alumni = len(filtered_df)
     employed_rate = (len(filtered_df[filtered_df['is_employed'] == 'Yes']) / filtered_alumni) * 100 if filtered_alumni > 0 else 0
     
-    # FIXED: Use actual survey completion data
+    # Use actual survey completion data
     completed_surveys = len(dashboard.survey_df[dashboard.survey_df['is_completed'] == 1])
     survey_rate = (completed_surveys / total_alumni) * 100 if total_alumni > 0 else 0
     
@@ -819,8 +852,8 @@ def create_data_explorer(dashboard, filtered_df):
             if sort_column in display_df.columns:
                 display_df = display_df.sort_values(sort_column, ascending=(sort_by != "Graduation Year"))
         
-        # Show key metrics first - FIXED: Exclude admin from all counts
-        total_alumni_no_admin = len(dashboard.users_df)  # Already excludes admin
+        # Show key metrics first
+        total_alumni_no_admin = len(dashboard.users_df)
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             st.metric("Total Alumni (Excluding Admin)", total_alumni_no_admin)
@@ -884,10 +917,16 @@ def create_data_explorer(dashboard, filtered_df):
                 lambda x: 'Completed' if x == 1 else 'Not Completed'
             )
         
-        # FIXED: Ensure graduation year displays as integer without decimals
+        # Ensure graduation year displays as integer without decimals and handles invalid years
         if 'Graduation Year' in display_df_clean.columns:
-            display_df_clean['Graduation Year'] = display_df_clean['Graduation Year'].fillna(0).astype(int)
-            display_df_clean['Graduation Year'] = display_df_clean['Graduation Year'].replace(0, '')
+            # Convert to numeric, handling errors
+            display_df_clean['Graduation Year'] = pd.to_numeric(display_df_clean['Graduation Year'], errors='coerce')
+            
+            # Replace invalid years (too old or future) with empty string
+            current_year = datetime.now().year
+            display_df_clean['Graduation Year'] = display_df_clean['Graduation Year'].apply(
+                lambda x: int(x) if pd.notna(x) and 1950 <= x <= current_year + 5 else ''
+            )
         
         # Keep only the most relevant columns for display
         key_columns = [
@@ -988,7 +1027,7 @@ def main():
     elif selected_nav == "Data Explorer":
         create_data_explorer(dashboard, filtered_df)
     
-    # Footer with data quality info - FIXED: Use correct counts (excluding admin)
+    # Footer with data quality info
     st.sidebar.markdown("---")
     st.sidebar.markdown("""
     **Data Quality:**
@@ -997,7 +1036,7 @@ def main():
     - {} Completed Surveys
     - Updated: {}
     """.format(
-        len(dashboard.users_df),  # Already excludes admin
+        len(dashboard.users_df),
         len(dashboard.employment_df),
         len(dashboard.survey_df[dashboard.survey_df['is_completed'] == 1]),
         datetime.now().strftime("%Y-%m-%d %H:%M")

@@ -3,10 +3,10 @@ import jwt from "jsonwebtoken"
 import mysql from "mysql2/promise"
 
 const dbConfig = {
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "uipbsitz_lify",
+  host: process.env.DB_HOST || "srv2050.hstgr.io",
+  user: process.env.DB_USER || "u185173985_alumify2025",
   password: process.env.DB_PASSWORD || "Alumify..2025",
-  database: process.env.DB_NAME || "uipbsitz_lify",
+  database: process.env.DB_NAME || "u185173985_alumify2025",
 }
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {

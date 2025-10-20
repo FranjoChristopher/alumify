@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 
 // Database Configuration
-const dbConfig = {
+const databaseConfiguration = {
   host: process.env.DB_HOST || "srv2050.hstgr.io",
   user: process.env.DB_USER || "u185173985_alumify2025",
   password: process.env.DB_PASSWORD || "Alumify..2025",

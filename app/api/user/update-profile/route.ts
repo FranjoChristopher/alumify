@@ -3,13 +3,15 @@ import mysql from 'mysql2/promise';
 
 async function connectDB() {
   return await mysql.createConnection({
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "uipbsitz_lify",
+    host: process.env.DB_HOST || "srv2050.hstgr.io",
+    user: process.env.DB_USER || "u185173985_alumify2025",
     password: process.env.DB_PASSWORD || "Alumify..2025",
-    database: process.env.DB_NAME || "uipbsitz_lify",
-    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
+    database: process.env.DB_NAME || "u185173985_alumify2025",
+    
   });
 }
+
+
 
 export async function PUT(request: NextRequest) {
   let connection;
