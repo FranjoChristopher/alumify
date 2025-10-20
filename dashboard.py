@@ -782,8 +782,7 @@ export default function AdminDashboard() {
                                     <AlertDialogHeader>
                                       <AlertDialogTitle>Delete Alumni Profile</AlertDialogTitle>
                                       <AlertDialogDescription>
-                                        Are you sure you want to delete {alumni.name}'s profile? This action cannot be
-                                        undone.
+                                        Are you sure you want to delete {alumni.name}'s profile? This action cannot be undone.
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
