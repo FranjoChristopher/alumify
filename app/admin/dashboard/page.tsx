@@ -609,19 +609,12 @@ Logout
 <TabsTrigger value="trends">Trends</TabsTrigger>
 </TabsList>
 
-<TabsContent value="analytics" className="space-y-6">
-<Card>
-<CardHeader>
-<CardTitle>Analytics Dashboard</CardTitle>
-</CardHeader>
-<CardContent>
-      <div className="text-center py-12">
-        <TrendingUp className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold mb-2">Interactive Analytics</h3>
-        <p className="text-gray-600 mb-6 max-w-md mx-auto">
-          Access detailed analytics and insights through our interactive dashboard.
-        </p>
-        <div className="flex gap-4 justify-center">
+            <TabsContent value="analytics" className="space-y-6">
+  <Card>
+    <CardHeader>
+      <CardTitle>Analytics Dashboard</CardTitle>
+    </CardHeader>
+    <CardContent>
       <div className="space-y-6">
         {/* Dashboard Embed Section */}
         <div className="border rounded-lg overflow-hidden bg-gray-50">
@@ -661,14 +654,8 @@ Logout
                 <p className="text-sm text-gray-600">Loading dashboard...</p>
               </div>
             </div>
+
             
-            <iframe
-              id="analyticsIframe"
-              src="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/?embed=true&show_toolbar=false"
-              className="w-full h-full border-0"
-              onLoad={() => {
-                document.getElementById('loadingIndicator').style.display = 'none';
-              }}
               onError={() => {
                 const loader = document.getElementById('loadingIndicator');
                 loader.innerHTML = `
@@ -690,25 +677,22 @@ Logout
 
         {/* Action Buttons */}
         <div className="flex gap-4 justify-center pt-4">
-<Button asChild>
-<a 
-              href="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/" 
+          <Button asChild>
+            <a 
               href="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/?embed=true" 
-target="_blank" 
-rel="noopener noreferrer"
-className="flex items-center gap-2"
->
-              <Maximize2 className="h-4 w-4" />
-              Open Dashboard
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2"
+            >
               <ExternalLink className="h-4 w-4" />
               Open Full Dashboard
-</a>
-</Button>
-<Button variant="outline" onClick={fetchAllData}>
-<RefreshCw className="h-4 w-4 mr-2" />
-Refresh Data
-</Button>
-</div>
+            </a>
+          </Button>
+          <Button variant="outline" onClick={fetchAllData}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh Data
+          </Button>
+        </div>
 
         {/* Quick Stats Preview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
@@ -729,9 +713,9 @@ Refresh Data
             <div className="text-sm text-gray-600">Active Users</div>
           </Card>
         </div>
-</div>
-</CardContent>
-</Card>
+      </div>
+    </CardContent>
+  </Card>
 </TabsContent>
 <TabsContent value="alumni" className="space-y-6">
 <Card>
