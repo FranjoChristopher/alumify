@@ -655,7 +655,13 @@ export default function AdminDashboard() {
               </div>
             </div>
             
-            
+            <iframe
+              id="analyticsIframe"
+              src="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/?embed=true&show_toolbar=false"
+              className="w-full h-full border-0"
+              onLoad={() => {
+                document.getElementById('loadingIndicator').style.display = 'none';
+              }}
               onError={() => {
                 const loader = document.getElementById('loadingIndicator');
                 loader.innerHTML = `
