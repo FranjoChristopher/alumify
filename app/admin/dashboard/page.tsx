@@ -669,7 +669,7 @@ export default function AdminDashboard() {
                     <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
                     <h4 class="font-semibold text-red-600">Failed to load dashboard</h4>
                     <p class="text-sm text-gray-600 mb-3">Please try opening in a new tab</p>
-                    <Button onClick="window.open('https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/', '_blank')">
+                    <Button onClick="window.open('https://symmetrical-space-invention-pjpjppqpq6p5367q7-8501.app.github.dev/', '_blank')">
                       Open in New Tab
                     </Button>
                   </div>
@@ -685,7 +685,7 @@ export default function AdminDashboard() {
         <div className="flex gap-4 justify-center pt-4">
           <Button asChild>
             <a 
-              href="https://franjochristopher-alumify-dashboard-r9n5vi.streamlit.app/?embed=true" 
+              href="https://symmetrical-space-invention-pjpjppqpq6p5367q7-8501.app.github.dev/?embed=true" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2"
