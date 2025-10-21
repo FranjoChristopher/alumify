@@ -5,7 +5,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
-from streamlit.web.server.websocket_headers import _get_websocket_headers
 import mysql.connector
 import warnings
 import io
@@ -783,32 +782,33 @@ def create_actionable_insights(dashboard, filtered_df):
         # Program insights
         st.markdown('<div class="subsection-header">Program Analysis</div>', unsafe_allow_html=True)
         
-        # Top programs by employment
-        program_employment = filtered_df.groupby('degree').apply(
-            lambda x: (x['is_employed'] == 'Yes').sum() / len(x) * 100 if len(x) > 0 else 0
-        ).sort_values(ascending=False)
-        
-        if len(program_employment) > 0:
-            top_program = program_employment.index[0]
-            top_rate = program_employment.iloc[0]
+        # Top programs by employment - FIXED: Use sort_values(ascending=False) directly on Series
+        if not filtered_df.empty and 'degree' in filtered_df.columns and 'is_employed' in filtered_df.columns:
+            program_employment = filtered_df.groupby('degree').apply(
+                lambda x: (x['is_employed'] == 'Yes').sum() / len(x) * 100 if len(x) > 0 else 0
+            ).sort_values(ascending=False)
             
-            st.markdown(f"""
-            <div class="story-card">
-                <strong>Top Performer:</strong> {top_program} program has {top_rate:.0f}% employment rate.
-                Document best practices for knowledge sharing across departments.
-            </div>
-            """, unsafe_allow_html=True)
-            
-            if len(program_employment) > 1:
-                bottom_program = program_employment.index[-1]
-                bottom_rate = program_employment.iloc[-1]
+            if len(program_employment) > 0:
+                top_program = program_employment.index[0]
+                top_rate = program_employment.iloc[0]
                 
                 st.markdown(f"""
-                <div class="alert-card">
-                    <strong>Improvement Opportunity:</strong> {bottom_program} program at {bottom_rate:.0f}% employment needs support.
-                    Consider curriculum review and industry alignment assessment.
+                <div class="story-card">
+                    <strong>Top Performer:</strong> {top_program} program has {top_rate:.0f}% employment rate.
+                    Document best practices for knowledge sharing across departments.
                 </div>
                 """, unsafe_allow_html=True)
+                
+                if len(program_employment) > 1:
+                    bottom_program = program_employment.index[-1]
+                    bottom_rate = program_employment.iloc[-1]
+                    
+                    st.markdown(f"""
+                    <div class="alert-card">
+                        <strong>Improvement Opportunity:</strong> {bottom_program} program at {bottom_rate:.0f}% employment needs support.
+                        Consider curriculum review and industry alignment assessment.
+                    </div>
+                    """, unsafe_allow_html=True)
 
 def create_data_explorer(dashboard, filtered_df):
     """Create enhanced Data Explorer with better field names and organization"""
@@ -956,16 +956,16 @@ def create_data_explorer(dashboard, filtered_df):
                 mime="text/csv",
                 use_container_width=True
             )
-        # with col2:
-        #     excel_buffer = io.BytesIO()
-        #     display_df_clean.to_excel(excel_buffer, index=False, engine='openpyxl')
-        #     st.download_button(
-        #         label="Download Excel",
-        #         data=excel_buffer.getvalue(),
-        #         file_name=f"alumni_data_{datetime.now().strftime('%Y%m%d')}.xlsx",
-        #         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        #         use_container_width=True
-        #     )
+        with col2:
+            excel_buffer = io.BytesIO()
+            display_df_clean.to_excel(excel_buffer, index=False, engine='openpyxl')
+            st.download_button(
+                label="Download Excel",
+                data=excel_buffer.getvalue(),
+                file_name=f"alumni_data_{datetime.now().strftime('%Y%m%d')}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
     else:
         st.info("No data available with the current filters.")
 
