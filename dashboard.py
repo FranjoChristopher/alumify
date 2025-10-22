@@ -956,16 +956,16 @@ def create_data_explorer(dashboard, filtered_df):
                 mime="text/csv",
                 use_container_width=True
             )
-        with col2:
-            excel_buffer = io.BytesIO()
-            display_df_clean.to_excel(excel_buffer, index=False, engine='openpyxl')
-            st.download_button(
-                label="Download Excel",
-                data=excel_buffer.getvalue(),
-                file_name=f"alumni_data_{datetime.now().strftime('%Y%m%d')}.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                use_container_width=True
-            )
+        # with col2:
+        #     excel_buffer = io.BytesIO()
+        #     display_df_clean.to_excel(excel_buffer, index=False, engine='openpyxl')
+        #     st.download_button(
+        #         label="Download Excel",
+        #         data=excel_buffer.getvalue(),
+        #         file_name=f"alumni_data_{datetime.now().strftime('%Y%m%d')}.xlsx",
+        #         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        #         use_container_width=True
+        #     )
     else:
         st.info("No data available with the current filters.")
 
