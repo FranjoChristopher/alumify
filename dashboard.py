@@ -678,49 +678,59 @@ def create_plotly_enhanced_visualizations(dashboard, filtered_df, filters):
                         """, unsafe_allow_html=True)
     
     with col4:
-        st.markdown('<div class="subsection-header">Industry Placement - Debug View</div>', unsafe_allow_html=True)
+        st.markdown('<div class="subsection-header">Industry Placement - Ultimate Debug</div>', unsafe_allow_html=True)
         
-        # Comprehensive debug
-        st.write("### Data Debug")
-        st.write(f"Total filtered records: {len(filtered_df)}")
+        # 1. First, let's see what's actually in the employment_data table
+        st.write("### Raw Employment Data from Database")
+        raw_employment_query = "SELECT * FROM employment_data WHERE business_line IS NOT NULL AND business_line != ''"
+        raw_employment = pd.read_sql(raw_employment_query, dashboard.connection)
+        st.write(f"Total employment records with business_line: {len(raw_employment)}")
+        st.dataframe(raw_employment[['user_id', 'is_employed', 'business_line']])
         
-        if 'business_line' in filtered_df.columns and 'is_employed' in filtered_df.columns:
-            # Show employment breakdown
-            employment_counts = filtered_df['is_employed'].value_counts()
-            st.write("Employment status:", dict(employment_counts))
-            
-            # Show business_line data quality
-            business_line_data = filtered_df[['business_line', 'is_employed']].copy()
-            business_line_data['has_industry'] = business_line_data['business_line'].notna() & (business_line_data['business_line'].str.strip() != '')
-            
-            st.write("Industry data quality:")
-            st.write(business_line_data['has_industry'].value_counts())
-            
-            # Show sample of actual business_line values
-            valid_industries = business_line_data[business_line_data['has_industry']]['business_line'].unique()
-            st.write("Valid industries found:", list(valid_industries))
-            
-            # Create the chart if we have data
-            employed_with_industry = business_line_data[
-                (business_line_data['is_employed'] == 'Yes') & 
-                (business_line_data['has_industry'])
+        # 2. Show what's in the filtered_df
+        st.write("### Current Filtered Data")
+        st.write(f"Filtered records: {len(filtered_df)}")
+        if len(filtered_df) > 0:
+            st.write("Columns in filtered_df:", list(filtered_df.columns))
+            if 'business_line' in filtered_df.columns:
+                st.write("Business_line values in filtered data:")
+                biz_counts = filtered_df['business_line'].value_counts()
+                st.write(dict(biz_counts))
+            else:
+                st.error("business_line column missing from filtered_df!")
+        
+        # 3. Simple direct approach
+        st.write("### Simple Industry Count")
+        if not filtered_df.empty and 'business_line' in filtered_df.columns:
+            # Get non-empty business lines from employed people
+            industry_data = filtered_df[
+                (filtered_df['is_employed'] == 'Yes') & 
+                (filtered_df['business_line'].notna()) & 
+                (filtered_df['business_line'].str.strip() != '')
             ]
             
-            if len(employed_with_industry) > 0:
-                industries = employed_with_industry['business_line'].value_counts().head(6)
+            st.write(f"Employed alumni with industry data: {len(industry_data)}")
+            
+            if len(industry_data) > 0:
+                industries = industry_data['business_line'].value_counts()
+                st.write("Industry counts:", dict(industries))
                 
-                fig = px.bar(
-                    x=industries.values,
-                    y=industries.index,
-                    orientation='h',
-                    title="Industry Placement",
-                    labels={'x': 'Number of Alumni', 'y': 'Industry'}
-                )
-                st.plotly_chart(fig, use_container_width=True)
+                # Create simple bar chart
+                if len(industries) > 0:
+                    fig = px.bar(
+                        x=industries.values,
+                        y=industries.index,
+                        orientation='h',
+                        title="Industry Distribution",
+                        labels={'x': 'Count', 'y': 'Industry'}
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.warning("No industries to display after filtering")
             else:
                 st.warning("No employed alumni with industry data in current filters")
         else:
-            st.error("Required columns (business_line, is_employed) not found")
+            st.error("Cannot generate industry chart - data not available")
 
 def create_actionable_insights(dashboard, filtered_df):
     """Create actionable insights section"""
