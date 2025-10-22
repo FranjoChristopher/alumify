@@ -678,59 +678,49 @@ def create_plotly_enhanced_visualizations(dashboard, filtered_df, filters):
                         """, unsafe_allow_html=True)
     
     with col4:
-        st.markdown('<div class="subsection-header">Industry Placement - Ultimate Debug</div>', unsafe_allow_html=True)
-        
-        # 1. First, let's see what's actually in the employment_data table
-        st.write("### Raw Employment Data from Database")
-        raw_employment_query = "SELECT * FROM employment_data WHERE business_line IS NOT NULL AND business_line != ''"
-        raw_employment = pd.read_sql(raw_employment_query, dashboard.connection)
-        st.write(f"Total employment records with business_line: {len(raw_employment)}")
-        st.dataframe(raw_employment[['user_id', 'is_employed', 'business_line']])
-        
-        # 2. Show what's in the filtered_df
-        st.write("### Current Filtered Data")
-        st.write(f"Filtered records: {len(filtered_df)}")
-        if len(filtered_df) > 0:
-            st.write("Columns in filtered_df:", list(filtered_df.columns))
-            if 'business_line' in filtered_df.columns:
-                st.write("Business_line values in filtered data:")
-                biz_counts = filtered_df['business_line'].value_counts()
-                st.write(dict(biz_counts))
-            else:
-                st.error("business_line column missing from filtered_df!")
-        
-        # 3. Simple direct approach
-        st.write("### Simple Industry Count")
+        st.markdown('<div class="subsection-header">Industry Placement</div>', unsafe_allow_html=True)
         if not filtered_df.empty and 'business_line' in filtered_df.columns:
-            # Get non-empty business lines from employed people
-            industry_data = filtered_df[
-                (filtered_df['is_employed'] == 'Yes') & 
-                (filtered_df['business_line'].notna()) & 
-                (filtered_df['business_line'].str.strip() != '')
-            ]
+            industries = filtered_df['business_line'].value_counts().head(6)
             
-            st.write(f"Employed alumni with industry data: {len(industry_data)}")
-            
-            if len(industry_data) > 0:
-                industries = industry_data['business_line'].value_counts()
-                st.write("Industry counts:", dict(industries))
+            if len(industries) > 0:
+                # Remove decimals from industry counts - convert to integers
+                industries_clean = industries.astype(int)
                 
-                # Create simple bar chart
-                if len(industries) > 0:
-                    fig = px.bar(
-                        x=industries.values,
-                        y=industries.index,
-                        orientation='h',
-                        title="Industry Distribution",
-                        labels={'x': 'Count', 'y': 'Industry'}
-                    )
-                    st.plotly_chart(fig, use_container_width=True)
-                else:
-                    st.warning("No industries to display after filtering")
-            else:
-                st.warning("No employed alumni with industry data in current filters")
-        else:
-            st.error("Cannot generate industry chart - data not available")
+                fig = px.bar(
+                    x=industries_clean.values,
+                    y=industries_clean.index,
+                    orientation='h',
+                    title="",
+                    labels={'x': 'Number of Alumni', 'y': 'Industry'},
+                    color=industries_clean.values,
+                    color_continuous_scale='Blues'
+                )
+                fig.update_layout(
+                    height=350,
+                    showlegend=False,
+                    xaxis_title="Number of Alumni",
+                    yaxis_title=""
+                )
+                # Remove decimals from x-axis and hover text
+                fig.update_xaxes(tickformat='d')
+                fig.update_traces(
+                    hovertemplate='<b>%{y}</b><br>Alumni Count: %{x}<extra></extra>',
+                    texttemplate='%{x}',
+                    textposition='outside'
+                )
+                # Remove color bar to avoid decimal display
+                fig.update_coloraxes(showscale=False)
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Strategic Insight for Industry Placement
+                top_industry = industries_clean.index[0]
+                top_count = industries_clean.iloc[0]
+                st.markdown(f"""
+                <div class="strategic-insight">
+                    <strong>Industry Leader:</strong> {top_industry} employs {top_count} alumni. 
+                    Strengthen partnerships and recruitment opportunities in this sector.
+                </div>
+                """, unsafe_allow_html=True)
 
 def create_actionable_insights(dashboard, filtered_df):
     """Create actionable insights section"""
