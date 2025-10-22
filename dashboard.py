@@ -677,50 +677,84 @@ def create_plotly_enhanced_visualizations(dashboard, filtered_df, filters):
                         </div>
                         """, unsafe_allow_html=True)
     
-    with col4:
-        st.markdown('<div class="subsection-header">Industry Placement</div>', unsafe_allow_html=True)
-        if not filtered_df.empty and 'business_line' in filtered_df.columns:
-            industries = filtered_df['business_line'].value_counts().head(6)
+with col4:
+    st.markdown('<div class="subsection-header">Industry Placement</div>', unsafe_allow_html=True)
+    
+    # Debug information in sidebar
+    if 'business_line' in filtered_df.columns:
+        # Get employment data with business_line
+        employment_with_industry = filtered_df[['business_line', 'is_employed']].dropna()
+        
+        # Filter only employed alumni and valid business lines
+        employed_with_industry = employment_with_industry[
+            (employment_with_industry['is_employed'] == 'Yes') & 
+            (employment_with_industry['business_line'].str.strip() != '')
+        ]
+        
+        st.sidebar.markdown("### Industry Debug Info")
+        st.sidebar.write(f"Total filtered: {len(filtered_df)}")
+        st.sidebar.write(f"With business_line: {len(employment_with_industry)}")
+        st.sidebar.write(f"Employed with valid industry: {len(employed_with_industry)}")
+        
+        if len(employed_with_industry) > 0:
+            # Count industries
+            industries = employed_with_industry['business_line'].value_counts().head(6)
             
+            st.sidebar.write("Industry counts:", industries.to_dict())
+            
+            # Create the bar chart
+            fig = px.bar(
+                x=industries.values,
+                y=industries.index,
+                orientation='h',
+                title="",
+                labels={'x': 'Number of Alumni', 'y': 'Industry'},
+                color=industries.values,
+                color_continuous_scale='Blues'
+            )
+            fig.update_layout(
+                height=350,
+                showlegend=False,
+                xaxis_title="Number of Alumni",
+                yaxis_title="",
+                margin=dict(l=20, r=20, t=30, b=20)
+            )
+            # Ensure integer display
+            fig.update_xaxes(tickformat='d', tickmode='linear')
+            fig.update_traces(
+                hovertemplate='<b>%{y}</b><br>Alumni Count: %{x}<extra></extra>',
+                texttemplate='%{x}',
+                textposition='outside'
+            )
+            fig.update_coloraxes(showscale=False)
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # Strategic Insight
             if len(industries) > 0:
-                # Remove decimals from industry counts - convert to integers
-                industries_clean = industries.astype(int)
-                
-                fig = px.bar(
-                    x=industries_clean.values,
-                    y=industries_clean.index,
-                    orientation='h',
-                    title="",
-                    labels={'x': 'Number of Alumni', 'y': 'Industry'},
-                    color=industries_clean.values,
-                    color_continuous_scale='Blues'
-                )
-                fig.update_layout(
-                    height=350,
-                    showlegend=False,
-                    xaxis_title="Number of Alumni",
-                    yaxis_title=""
-                )
-                # Remove decimals from x-axis and hover text
-                fig.update_xaxes(tickformat='d')
-                fig.update_traces(
-                    hovertemplate='<b>%{y}</b><br>Alumni Count: %{x}<extra></extra>',
-                    texttemplate='%{x}',
-                    textposition='outside'
-                )
-                # Remove color bar to avoid decimal display
-                fig.update_coloraxes(showscale=False)
-                st.plotly_chart(fig, use_container_width=True)
-                
-                # Strategic Insight for Industry Placement
-                top_industry = industries_clean.index[0]
-                top_count = industries_clean.iloc[0]
+                top_industry = industries.index[0]
+                top_count = industries.iloc[0]
                 st.markdown(f"""
                 <div class="strategic-insight">
                     <strong>Industry Leader:</strong> {top_industry} employs {top_count} alumni. 
                     Strengthen partnerships and recruitment opportunities in this sector.
                 </div>
                 """, unsafe_allow_html=True)
+        else:
+            # Show why no data is available
+            st.info("No industry placement data available for current filters.")
+            
+            # Diagnostic information
+            employed_count = len(filtered_df[filtered_df['is_employed'] == 'Yes'])
+            st.write(f"- Employed alumni in current filters: {employed_count}")
+            
+            if employed_count > 0:
+                st.write("- Industry data might be missing for employed alumni")
+                st.write("- Try selecting 'All' in employment status filter")
+            else:
+                st.write("- No employed alumni match the current filters")
+                st.write("- Try changing employment status filter to 'Yes' or 'All'")
+    else:
+        st.warning("Industry data column ('business_line') not found in the dataset.")
 
 def create_actionable_insights(dashboard, filtered_df):
     """Create actionable insights section"""
