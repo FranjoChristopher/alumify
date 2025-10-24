@@ -322,6 +322,7 @@ class AlumifyDashboard:
 
         self.merged_df = merged
 
+
 def create_enhanced_filters(dashboard):
     """Create enhanced filters with dynamic year range based on available data"""
     st.sidebar.markdown("### Dashboard Controls")
@@ -405,6 +406,7 @@ def create_enhanced_filters(dashboard):
         'employment_status': selected_employment
     }
 
+
 def apply_enhanced_filters(dashboard, filters):
     """Apply enhanced filters with better logic"""
     filtered_df = dashboard.merged_df.copy()
@@ -428,6 +430,7 @@ def apply_enhanced_filters(dashboard, filters):
         filtered_df = filtered_df[filtered_df['is_employed'] == filters['employment_status']]
 
     return filtered_df
+
 
 def generate_ai_narrative(dashboard, filtered_df, filters):
     """Generate AI-assisted narrative text based on current filters and data"""
@@ -465,6 +468,7 @@ def generate_ai_narrative(dashboard, filtered_df, filters):
        """)
 
     return "\n".join(narrative_parts)
+
 
 def create_strategic_kpi_metrics(dashboard, filtered_df):
     """Create KPI metrics following strategic design principles"""
@@ -523,6 +527,7 @@ def create_strategic_kpi_metrics(dashboard, filtered_df):
                <div class="metric-delta">Total Engagements</div>
            </div>
            """, unsafe_allow_html=True)
+
 
 def create_plotly_enhanced_visualizations(dashboard, filtered_df, filters):
     """Create enhanced Plotly visualizations with better storytelling and strategic insights"""
@@ -722,6 +727,7 @@ def create_plotly_enhanced_visualizations(dashboard, filtered_df, filters):
                    </div>
                    """, unsafe_allow_html=True)
 
+
 def create_actionable_insights(dashboard, filtered_df):
     """Create actionable insights section"""
     st.markdown('<div class="section-header">Strategic Insights & Recommendations</div>', unsafe_allow_html=True)
@@ -809,6 +815,7 @@ def create_actionable_insights(dashboard, filtered_df):
                            Consider curriculum review and industry alignment assessment.
                        </div>
                        """, unsafe_allow_html=True)
+
 
 def create_data_explorer(dashboard, filtered_df):
     """Create enhanced Data Explorer with better field names and organization"""
@@ -969,6 +976,7 @@ def create_data_explorer(dashboard, filtered_df):
     else:
         st.info("No data available with the current filters.")
 
+
 def create_spa_navigation():
     """Create Single Page Application navigation without deprecated query parameters"""
     # Initialize session state for navigation
@@ -989,6 +997,7 @@ def create_spa_navigation():
 
     st.markdown("---")
     return st.session_state.nav_section
+
 
 def main():
     # Initialize dashboard
@@ -1042,6 +1051,7 @@ def main():
         len(dashboard.survey_df[dashboard.survey_df['is_completed'] == 1]),
         datetime.now().strftime("%Y-%m-%d %H:%M")
     ))
+
 
 if __name__ == "__main__":
     main()
