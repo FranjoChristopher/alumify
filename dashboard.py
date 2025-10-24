@@ -231,6 +231,17 @@ class AlumifyDashboard:
             st.error(f"Database connection error: {e}")
             return None
     
+    def refresh_data(self):
+        """Refresh all data from database"""
+        if self.connection:
+            try:
+                self.load_data()
+                return True
+            except Exception as e:
+                st.error(f"Error refreshing data: {e}")
+                return False
+        return False
+    
     def load_data(self):
         """Load all data from database"""
         with st.spinner('Loading live data from database...'):
