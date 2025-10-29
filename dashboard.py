@@ -204,6 +204,46 @@ st.markdown("""
         font-weight: 600;
         background-color: #f0f0f0;
     }
+    
+    /* Comparison Table Styling */
+    .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.9rem;
+    }
+    
+    .comparison-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.75rem;
+        text-align: left;
+        font-weight: 600;
+    }
+    
+    .comparison-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #E8E8E8;
+    }
+    
+    .comparison-table tr:nth-child(even) {
+        background-color: #F8F9FA;
+    }
+    
+    .comparison-table tr:hover {
+        background-color: #E3F2FD;
+    }
+    
+    .highlight-best {
+        background-color: #E8F5E8 !important;
+        font-weight: 600;
+        color: #2E7D32;
+    }
+    
+    .highlight-worst {
+        background-color: #FFEBEE !important;
+        color: #C62828;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -465,6 +505,170 @@ def generate_ai_narrative(dashboard, filtered_df, filters):
     """)
     
     return "\n".join(narrative_parts)
+
+def create_program_comparison_tables(dashboard, filtered_df, filters):
+    """Create separate comparison tables when 2 or more programs are selected"""
+    
+    # Check if we have 2 or more specific programs selected (not "All Programs")
+    if 'All Programs' not in filters['programs'] and len(filters['programs']) >= 2:
+        st.markdown('<div class="section-header">Program Comparison Analysis</div>', unsafe_allow_html=True)
+        
+        # Create comparison data for each program
+        comparison_data = []
+        
+        for program in filters['programs']:
+            program_df = filtered_df[filtered_df['degree'] == program]
+            
+            if len(program_df) > 0:
+                # Employment metrics
+                employed_count = len(program_df[program_df['is_employed'] == 'Yes'])
+                unemployed_count = len(program_df[program_df['is_employed'] == 'No'])
+                total_count = len(program_df)
+                employment_rate = (employed_count / total_count * 100) if total_count > 0 else 0
+                
+                # Industry distribution (top 3)
+                industries = program_df['business_line'].value_counts().head(3)
+                top_industries = ", ".join([f"{ind} ({count})" for ind, count in industries.items()]) if len(industries) > 0 else "No data"
+                
+                # Job levels
+                current_job_levels = program_df['job_level_current'].value_counts()
+                senior_positions = current_job_levels.get('Managerial', 0) + current_job_levels.get('Executive', 0)
+                senior_rate = (senior_positions / total_count * 100) if total_count > 0 else 0
+                
+                # Survey completion
+                survey_completed = len(program_df[program_df['is_completed'] == 1])
+                survey_rate = (survey_completed / total_count * 100) if total_count > 0 else 0
+                
+                # Curriculum relevance
+                relevant_count = len(program_df[program_df['curriculum_relevant'] == 'Yes'])
+                relevance_rate = (relevant_count / total_count * 100) if total_count > 0 else 0
+                
+                comparison_data.append({
+                    'Program': program,
+                    'Total Alumni': total_count,
+                    'Employment Rate': round(employment_rate, 1),
+                    'Employed Count': employed_count,
+                    'Unemployed Count': unemployed_count,
+                    'Top Industries': top_industries,
+                    'Senior Position Rate': round(senior_rate, 1),
+                    'Survey Completion Rate': round(survey_rate, 1),
+                    'Curriculum Relevance Rate': round(relevance_rate, 1)
+                })
+        
+        if comparison_data:
+            comparison_df = pd.DataFrame(comparison_data)
+            
+            # Employment Distribution Table
+            st.markdown('<div class="subsection-header">Employment Distribution Comparison</div>', unsafe_allow_html=True)
+            employment_cols = ['Program', 'Total Alumni', 'Employment Rate', 'Employed Count', 'Unemployed Count']
+            employment_table = comparison_df[employment_cols].copy()
+            
+            # Highlight best and worst employment rates
+            employment_table_display = employment_table.copy()
+            if len(employment_table) > 1:
+                best_employment = employment_table['Employment Rate'].max()
+                worst_employment = employment_table['Employment Rate'].min()
+                
+                def highlight_employment(row):
+                    if row['Employment Rate'] == best_employment:
+                        return ['highlight-best'] * len(row)
+                    elif row['Employment Rate'] == worst_employment:
+                        return ['highlight-worst'] * len(row)
+                    return [''] * len(row)
+                
+                # Display styled table
+                st.markdown("""
+                <style>
+                    .highlight-best { background-color: #E8F5E8 !important; font-weight: 600; color: #2E7D32; }
+                    .highlight-worst { background-color: #FFEBEE !important; color: #C62828; }
+                </style>
+                """, unsafe_allow_html=True)
+                
+                # Create a styled dataframe for employment
+                styled_employment = employment_table.style.apply(highlight_employment, axis=1)
+                st.dataframe(styled_employment, use_container_width=True)
+            else:
+                st.dataframe(employment_table, use_container_width=True)
+            
+            # Program Performance Table
+            st.markdown('<div class="subsection-header">Program Performance Metrics</div>', unsafe_allow_html=True)
+            performance_cols = ['Program', 'Employment Rate', 'Senior Position Rate', 'Curriculum Relevance Rate', 'Survey Completion Rate']
+            performance_table = comparison_df[performance_cols].copy()
+            
+            # Highlight best performance metrics
+            if len(performance_table) > 1:
+                metrics_to_highlight = ['Employment Rate', 'Senior Position Rate', 'Curriculum Relevance Rate', 'Survey Completion Rate']
+                
+                def highlight_performance(row):
+                    styles = [''] * len(row)
+                    for i, col in enumerate(performance_table.columns):
+                        if col in metrics_to_highlight:
+                            if row[col] == performance_table[col].max():
+                                styles[i] = 'highlight-best'
+                            elif row[col] == performance_table[col].min():
+                                styles[i] = 'highlight-worst'
+                    return styles
+                
+                styled_performance = performance_table.style.apply(highlight_performance, axis=1)
+                st.dataframe(styled_performance, use_container_width=True)
+            else:
+                st.dataframe(performance_table, use_container_width=True)
+            
+            # Industry Placement Table
+            st.markdown('<div class="subsection-header">Industry Placement Analysis</div>', unsafe_allow_html=True)
+            industry_table = comparison_df[['Program', 'Top Industries', 'Total Alumni']].copy()
+            st.dataframe(industry_table, use_container_width=True)
+            
+            # Add strategic insights based on comparison
+            st.markdown('<div class="subsection-header">Comparison Insights</div>', unsafe_allow_html=True)
+            
+            # Find best and worst performing programs
+            best_program = comparison_df.loc[comparison_df['Employment Rate'].idxmax()]
+            worst_program = comparison_df.loc[comparison_df['Employment Rate'].idxmin()]
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown(f"""
+                <div class="strategic-insight">
+                    <strong>Top Performer:</strong> {best_program['Program']}<br>
+                    • Employment Rate: {best_program['Employment Rate']}%<br>
+                    • Senior Positions: {best_program['Senior Position Rate']}%<br>
+                    • Curriculum Relevance: {best_program['Curriculum Relevance Rate']}%
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col2:
+                st.markdown(f"""
+                <div class="alert-card">
+                    <strong>Needs Improvement:</strong> {worst_program['Program']}<br>
+                    • Employment Rate: {worst_program['Employment Rate']}%<br>
+                    • Senior Positions: {worst_program['Senior Position Rate']}%<br>
+                    • Curriculum Relevance: {worst_program['Curriculum Relevance Rate']}%
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # Performance gap analysis
+            employment_gap = best_program['Employment Rate'] - worst_program['Employment Rate']
+            if employment_gap > 20:
+                st.markdown(f"""
+                <div class="alert-card">
+                    <strong>Significant Performance Gap:</strong> There's a {employment_gap:.1f}% difference in employment rates between the top and bottom programs. 
+                    Consider sharing best practices from {best_program['Program']} with {worst_program['Program']}.
+                </div>
+                """, unsafe_allow_html=True)
+            elif employment_gap > 10:
+                st.markdown(f"""
+                <div class="insight-highlight">
+                    <strong>Moderate Performance Gap:</strong> {employment_gap:.1f}% employment rate difference suggests opportunities for cross-program learning and improvement.
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="strategic-insight">
+                    <strong>Balanced Performance:</strong> Programs show relatively consistent employment outcomes ({employment_gap:.1f}% gap), indicating standardized program quality.
+                </div>
+                """, unsafe_allow_html=True)
 
 def create_strategic_kpi_metrics(dashboard, filtered_df):
     """Create KPI metrics following strategic design principles"""
@@ -1032,6 +1236,10 @@ def main():
     # Display selected section
     if selected_nav == "Executive Overview":
         create_strategic_kpi_metrics(dashboard, filtered_df)
+        
+        # Add program comparison tables when 2+ programs are selected
+        create_program_comparison_tables(dashboard, filtered_df, filters)
+        
         create_plotly_enhanced_visualizations(dashboard, filtered_df, filters)
         create_actionable_insights(dashboard, filtered_df)
         
