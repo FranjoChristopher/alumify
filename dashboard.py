@@ -579,23 +579,7 @@ def create_program_comparison_tables(dashboard, filtered_df, filters):
         if comparison_data:
             comparison_df = pd.DataFrame(comparison_data)
             
-           
-            
-            # Create a more presentable table
-            col1, col2, col3 = st.columns([1, 3, 1])
-            with col2:
-                st.markdown("""
-                <div class="presentable-table">
-                    <div class="table-header">Industry Placement by Program</div>
-                """, unsafe_allow_html=True)
-                
-                # Display the table
-                st.dataframe(
-                    industry_table,
-                    use_container_width=True,
-                    hide_index=True
-                )
-                 # Employment Distribution Table
+            # Employment Distribution Table
             st.markdown('<div class="subsection-header">Employment Distribution Comparison</div>', unsafe_allow_html=True)
             employment_cols = ['Program', 'Total Alumni', 'Employment Rate', 'Employed Count', 'Unemployed Count']
             employment_table = comparison_df[employment_cols].copy()
@@ -649,6 +633,21 @@ def create_program_comparison_tables(dashboard, filtered_df, filters):
             # Industry Placement Table
             st.markdown('<div class="subsection-header">Industry Placement Analysis</div>', unsafe_allow_html=True)
             industry_table = comparison_df[['Program', 'Top Industries', 'Total Alumni']].copy()
+            
+            # Create a more presentable table
+            col1, col2, col3 = st.columns([1, 3, 1])
+            with col2:
+                st.markdown("""
+                <div class="presentable-table">
+                    <div class="table-header">Industry Placement by Program</div>
+                """, unsafe_allow_html=True)
+                
+                # Display the table
+                st.dataframe(
+                    industry_table,
+                    use_container_width=True,
+                    hide_index=True
+                )
                 
                 st.markdown("</div>", unsafe_allow_html=True)
 
