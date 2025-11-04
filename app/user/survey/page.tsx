@@ -115,7 +115,7 @@ export default function SurveyPage() {
         if (!formData.present_occupation) errors.present_occupation = "Present occupation is required"
         if (!formData.business_line) errors.business_line = "Major line of business is required"
         if (!formData.place_of_work) errors.place_of_work = "Place of work is required"
-      } else if (formData.is_employed === "No (Employed Before)" || formData.is_employed === "Never Employed") {
+      } else if (formData.is_employed === "No" || formData.is_employed === "Never Employed") {
         if (!formData.unemployment_reasons || formData.unemployment_reasons?.length === 0) {
           errors.unemployment_reasons = "Please select at least one reason for not being employed"
         }
@@ -439,7 +439,7 @@ export default function SurveyPage() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="No" id="employed_no" />
-                  <Label htmlFor="employed_no">No</Label>
+                  <Label htmlFor="employed_no">No (But Employed Before)</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="Never Employed" id="never_employed" />
