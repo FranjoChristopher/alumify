@@ -132,7 +132,7 @@ export default function LoginPage() {
         <div className="text-center lg:text-left space-y-6">
   <div className="space-y-4">
     <div className="flex items-center justify-center lg:justify-start space-x-3">
-      <div className="bg-blue-600 p-2 rounded-full">
+      <div className="bg-black p-2 rounded-full">
         <img
           src="/alumifylogo.png"
           alt="Alumify Logo"
