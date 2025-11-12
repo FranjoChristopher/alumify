@@ -652,7 +652,7 @@ def create_program_comparison_tables(dashboard, filtered_df, filters):
                 st.markdown("</div>", unsafe_allow_html=True)
 
 def create_program_employment_analysis(dashboard, filtered_df):
-    """🧭 Create Program-Related Employment Analysis with Chart and Table"""
+    """🧭 Create Program-Related Employment Analysis with Chart and Table in 2 columns"""
     
     st.markdown('<div class="section-header">🧭 Program-Related Employment Analysis</div>', unsafe_allow_html=True)
     
@@ -686,74 +686,77 @@ def create_program_employment_analysis(dashboard, filtered_df):
         if program_employment_data:
             program_df = pd.DataFrame(program_employment_data).sort_values('Total Employed', ascending=False)
             
-            # 📊 1. Stacked Bar Chart - Program-Related Employment
-            st.markdown('<div class="subsection-header">📊 Program-Related Employment Distribution</div>', unsafe_allow_html=True)
+            # Create two columns for the visualizations
+            col1, col2 = st.columns(2)
             
-            # Prepare data for stacked bar chart
-            chart_df = program_df.melt(id_vars=['Program'], 
-                                     value_vars=['Related Jobs', 'Not Related Jobs'],
-                                     var_name='Job Type', 
-                                     value_name='Count')
-            
-            fig = px.bar(
-                chart_df,
-                x='Program',
-                y='Count',
-                color='Job Type',
-                title="Employment Relatedness by Program",
-                labels={'Count': 'Number of Graduates', 'Program': 'Academic Program'},
-                color_discrete_map={
-                    'Related Jobs': '#10B981',  # Green for related
-                    'Not Related Jobs': '#EF4444'  # Red for not related
-                }
-            )
-            
-            fig.update_layout(
-                height=500,
-                xaxis_tickangle=-45,
-                showlegend=True,
-                legend=dict(
-                    orientation="h",
-                    yanchor="bottom",
-                    y=1.02,
-                    xanchor="right",
-                    x=1
-                )
-            )
-            
-            # Add percentage annotations on bars
-            for program in program_df['Program']:
-                program_data = program_df[program_df['Program'] == program].iloc[0]
-                total = program_data['Total Employed']
-                related_pct = program_data['% Related']
+            with col1:
+                # 📊 Program-Related Employment Distribution
+                st.markdown('<div class="subsection-header">📊 Program-Related Employment Distribution</div>', unsafe_allow_html=True)
                 
-                fig.add_annotation(
-                    x=program,
-                    y=total + (total * 0.05),
-                    text=f"{related_pct}%",
-                    showarrow=False,
-                    font=dict(size=12, color="#2C3E50"),
-                    bgcolor="white",
-                    bordercolor="#2C3E50",
-                    borderwidth=1,
-                    borderpad=2
+                # Prepare data for stacked bar chart
+                chart_df = program_df.melt(id_vars=['Program'], 
+                                         value_vars=['Related Jobs', 'Not Related Jobs'],
+                                         var_name='Job Type', 
+                                         value_name='Count')
+                
+                fig = px.bar(
+                    chart_df,
+                    x='Program',
+                    y='Count',
+                    color='Job Type',
+                    title="Employment Relatedness by Program",
+                    labels={'Count': 'Number of Graduates', 'Program': 'Academic Program'},
+                    color_discrete_map={
+                        'Related Jobs': '#10B981',  # Green for related
+                        'Not Related Jobs': '#EF4444'  # Red for not related
+                    }
                 )
+                
+                fig.update_layout(
+                    height=500,
+                    xaxis_tickangle=-45,
+                    showlegend=True,
+                    legend=dict(
+                        orientation="h",
+                        yanchor="bottom",
+                        y=1.02,
+                        xanchor="right",
+                        x=1
+                    )
+                )
+                
+                # Add percentage annotations on bars
+                for program in program_df['Program']:
+                    program_data = program_df[program_df['Program'] == program].iloc[0]
+                    total = program_data['Total Employed']
+                    related_pct = program_data['% Related']
+                    
+                    fig.add_annotation(
+                        x=program,
+                        y=total + (total * 0.05),
+                        text=f"{related_pct}%",
+                        showarrow=False,
+                        font=dict(size=12, color="#2C3E50"),
+                        bgcolor="white",
+                        bordercolor="#2C3E50",
+                        borderwidth=1,
+                        borderpad=2
+                    )
+                
+                st.plotly_chart(fig, use_container_width=True)
             
-            st.plotly_chart(fig, use_container_width=True)
-            
-            # 📊 2. Relatedness Percentage Table
-            st.markdown('<div class="subsection-header">📊 Relatedness Percentage by Program</div>', unsafe_allow_html=True)
-            
-            # Create enhanced table with better formatting
-            display_table = program_df.copy()
-            display_table['% Related'] = display_table['% Related'].apply(lambda x: f"{x}%")
-            
-            # Sort by percentage related (highest first)
-            display_table = display_table.sort_values('% Related', ascending=False)
-            
-            # Create a styled table
-            col1, col2, col3 = st.columns([1, 3, 1])
             with col2:
+                # 📊 Relatedness Percentage Table
+                st.markdown('<div class="subsection-header">📊 Relatedness Percentage by Program</div>', unsafe_allow_html=True)
+                
+                # Create enhanced table with better formatting
+                display_table = program_df.copy()
+                display_table['% Related'] = display_table['% Related'].apply(lambda x: f"{x}%")
+                
+                # Sort by percentage related (highest first)
+                display_table = display_table.sort_values('% Related', ascending=False)
+                
+                # Create a styled table
                 st.markdown("""
                 <div class="presentable-table">
                     <div class="table-header">Program Employment Relatedness Analysis</div>
@@ -775,7 +778,7 @@ def create_program_employment_analysis(dashboard, filtered_df):
                 
                 st.markdown("</div>", unsafe_allow_html=True)
             
-            # 🎯 3. Strategic Insights
+            # 🎯 Strategic Insights (Full width below the two columns)
             st.markdown('<div class="subsection-header">🎯 Strategic Insights</div>', unsafe_allow_html=True)
             
             if len(program_df) > 0:
@@ -1407,10 +1410,15 @@ def main():
         # Add program comparison tables when 2+ programs are selected
         create_program_comparison_tables(dashboard, filtered_df, filters)
         
-        # 🧭 NEW: Add Program-Related Employment Analysis
+        # First visualization row: Employment Overview and Program Performance
+        create_plotly_enhanced_visualizations(dashboard, filtered_df, filters)
+        
+        # Second visualization row: Graduation Timeline and Industry Placement
+        # This is already handled within create_plotly_enhanced_visualizations
+        
+        # 🧭 NEW: Add Program-Related Employment Analysis BELOW the existing charts
         create_program_employment_analysis(dashboard, filtered_df)
         
-        create_plotly_enhanced_visualizations(dashboard, filtered_df, filters)
         create_actionable_insights(dashboard, filtered_df)
         
     elif selected_nav == "Data Explorer":
