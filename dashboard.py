@@ -691,7 +691,7 @@ def create_program_employment_analysis(dashboard, filtered_df):
             
             with col1:
                 # 📊 Program-Related Employment Distribution
-                st.markdown('<div class="subsection-header">📊 Program-Related Employment Distribution</div>', unsafe_allow_html=True)
+                st.markdown('<div class="subsection-header">Program-Related Employment Distribution</div>', unsafe_allow_html=True)
                 
                 # Prepare data for stacked bar chart
                 chart_df = program_df.melt(id_vars=['Program'], 
@@ -747,7 +747,7 @@ def create_program_employment_analysis(dashboard, filtered_df):
             
             with col2:
                 # 📊 Relatedness Percentage Table
-                st.markdown('<div class="subsection-header">📊 Relatedness Percentage by Program</div>', unsafe_allow_html=True)
+                st.markdown('<div class="subsection-header">Relatedness Percentage by Program</div>', unsafe_allow_html=True)
                 
                 # Create enhanced table with better formatting
                 display_table = program_df.copy()
@@ -779,7 +779,7 @@ def create_program_employment_analysis(dashboard, filtered_df):
                 st.markdown("</div>", unsafe_allow_html=True)
             
             # 🎯 Strategic Insights (Full width below the two columns)
-            st.markdown('<div class="subsection-header">🎯 Strategic Insights</div>', unsafe_allow_html=True)
+            # st.markdown('<div class="subsection-header">Strategic Insights</div>', unsafe_allow_html=True)
             
             if len(program_df) > 0:
                 # Find programs with highest and lowest relatedness
@@ -792,13 +792,13 @@ def create_program_employment_analysis(dashboard, filtered_df):
                     if highest_related['% Related'] >= 80:
                         st.markdown(f"""
                         <div class="strategic-insight">
-                            <strong>🏆 Excellence in Alignment:</strong> {highest_related['Program']} program shows outstanding curriculum-job alignment with {highest_related['% Related']}% of graduates working in related fields. Consider this program as a benchmark for best practices.
+                            <strong>Excellence in Alignment:</strong> {highest_related['Program']} program shows outstanding curriculum-job alignment with {highest_related['% Related']}% of graduates working in related fields. Consider this program as a benchmark for best practices.
                         </div>
                         """, unsafe_allow_html=True)
                     elif highest_related['% Related'] >= 60:
                         st.markdown(f"""
                         <div class="story-card">
-                            <strong>✅ Strong Performance:</strong> {highest_related['Program']} program demonstrates good alignment with {highest_related['% Related']}% related employment. Continue supporting industry partnerships and curriculum development.
+                            <strong>Strong Performance:</strong> {highest_related['Program']} program demonstrates good alignment with {highest_related['% Related']}% related employment. Continue supporting industry partnerships and curriculum development.
                         </div>
                         """, unsafe_allow_html=True)
                 
@@ -806,13 +806,13 @@ def create_program_employment_analysis(dashboard, filtered_df):
                     if lowest_related['% Related'] <= 30:
                         st.markdown(f"""
                         <div class="alert-card">
-                            <strong>⚠️ Attention Needed:</strong> {lowest_related['Program']} program shows low alignment ({lowest_related['% Related']}% related employment). Review curriculum relevance and career pathways for graduates.
+                            <strong>Attention Needed:</strong> {lowest_related['Program']} program shows low alignment ({lowest_related['% Related']}% related employment). Review curriculum relevance and career pathways for graduates.
                         </div>
                         """, unsafe_allow_html=True)
                     elif lowest_related['% Related'] <= 50:
                         st.markdown(f"""
                         <div class="insight-highlight">
-                            <strong>📈 Improvement Opportunity:</strong> {lowest_related['Program']} program has moderate alignment ({lowest_related['% Related']}% related employment). Consider enhancing internship programs and industry networking.
+                            <strong>Improvement Opportunity:</strong> {lowest_related['Program']} program has moderate alignment ({lowest_related['% Related']}% related employment). Consider enhancing internship programs and industry networking.
                         </div>
                         """, unsafe_allow_html=True)
                 
@@ -821,19 +821,19 @@ def create_program_employment_analysis(dashboard, filtered_df):
                 if avg_relatedness >= 70:
                     st.markdown(f"""
                     <div class="strategic-insight">
-                        <strong>📊 Overall Strong Alignment:</strong> Average program relatedness is {avg_relatedness:.1f}%, indicating good curriculum-industry alignment across programs. Focus on maintaining and sharing best practices.
+                        <strong>Overall Strong Alignment:</strong> Average program relatedness is {avg_relatedness:.1f}%, indicating good curriculum-industry alignment across programs. Focus on maintaining and sharing best practices.
                     </div>
                     """, unsafe_allow_html=True)
                 elif avg_relatedness >= 50:
                     st.markdown(f"""
                     <div class="insight-highlight">
-                        <strong>📊 Moderate Alignment:</strong> Average program relatedness is {avg_relatedness:.1f}%. Opportunity to strengthen curriculum-industry connections through advisory boards and updated course content.
+                        <strong>Moderate Alignment:</strong> Average program relatedness is {avg_relatedness:.1f}%. Opportunity to strengthen curriculum-industry connections through advisory boards and updated course content.
                     </div>
                     """, unsafe_allow_html=True)
                 else:
                     st.markdown(f"""
                     <div class="alert-card">
-                        <strong>📊 Improvement Needed:</strong> Average program relatedness is {avg_relatedness:.1f}%. Consider comprehensive curriculum review and stronger industry partnerships to improve graduate outcomes.
+                        <strong>Improvement Needed:</strong> Average program relatedness is {avg_relatedness:.1f}%. Consider comprehensive curriculum review and stronger industry partnerships to improve graduate outcomes.
                     </div>
                     """, unsafe_allow_html=True)
     
