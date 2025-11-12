@@ -651,6 +651,198 @@ def create_program_comparison_tables(dashboard, filtered_df, filters):
                 
                 st.markdown("</div>", unsafe_allow_html=True)
 
+def create_program_employment_analysis(dashboard, filtered_df):
+    """🧭 Create Program-Related Employment Analysis with Chart and Table"""
+    
+    st.markdown('<div class="section-header">🧭 Program-Related Employment Analysis</div>', unsafe_allow_html=True)
+    
+    # Filter only employed alumni for this analysis
+    employed_df = filtered_df[filtered_df['is_employed'] == 'Yes']
+    
+    if not employed_df.empty and 'degree' in employed_df.columns and 'curriculum_relevant' in employed_df.columns:
+        
+        # Calculate program-related employment data
+        program_employment_data = []
+        
+        for program in employed_df['degree'].dropna().unique():
+            program_data = employed_df[employed_df['degree'] == program]
+            total_employed = len(program_data)
+            
+            # Count related vs not related jobs
+            related_jobs = len(program_data[program_data['curriculum_relevant'] == 'Yes'])
+            not_related_jobs = len(program_data[program_data['curriculum_relevant'] == 'No'])
+            
+            # Calculate percentage
+            related_percentage = (related_jobs / total_employed * 100) if total_employed > 0 else 0
+            
+            program_employment_data.append({
+                'Program': program,
+                'Total Employed': total_employed,
+                'Related Jobs': related_jobs,
+                'Not Related Jobs': not_related_jobs,
+                '% Related': round(related_percentage, 1)
+            })
+        
+        if program_employment_data:
+            program_df = pd.DataFrame(program_employment_data).sort_values('Total Employed', ascending=False)
+            
+            # 📊 1. Stacked Bar Chart - Program-Related Employment
+            st.markdown('<div class="subsection-header">📊 Program-Related Employment Distribution</div>', unsafe_allow_html=True)
+            
+            # Prepare data for stacked bar chart
+            chart_df = program_df.melt(id_vars=['Program'], 
+                                     value_vars=['Related Jobs', 'Not Related Jobs'],
+                                     var_name='Job Type', 
+                                     value_name='Count')
+            
+            fig = px.bar(
+                chart_df,
+                x='Program',
+                y='Count',
+                color='Job Type',
+                title="Employment Relatedness by Program",
+                labels={'Count': 'Number of Graduates', 'Program': 'Academic Program'},
+                color_discrete_map={
+                    'Related Jobs': '#10B981',  # Green for related
+                    'Not Related Jobs': '#EF4444'  # Red for not related
+                }
+            )
+            
+            fig.update_layout(
+                height=500,
+                xaxis_tickangle=-45,
+                showlegend=True,
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    xanchor="right",
+                    x=1
+                )
+            )
+            
+            # Add percentage annotations on bars
+            for program in program_df['Program']:
+                program_data = program_df[program_df['Program'] == program].iloc[0]
+                total = program_data['Total Employed']
+                related_pct = program_data['% Related']
+                
+                fig.add_annotation(
+                    x=program,
+                    y=total + (total * 0.05),
+                    text=f"{related_pct}%",
+                    showarrow=False,
+                    font=dict(size=12, color="#2C3E50"),
+                    bgcolor="white",
+                    bordercolor="#2C3E50",
+                    borderwidth=1,
+                    borderpad=2
+                )
+            
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # 📊 2. Relatedness Percentage Table
+            st.markdown('<div class="subsection-header">📊 Relatedness Percentage by Program</div>', unsafe_allow_html=True)
+            
+            # Create enhanced table with better formatting
+            display_table = program_df.copy()
+            display_table['% Related'] = display_table['% Related'].apply(lambda x: f"{x}%")
+            
+            # Sort by percentage related (highest first)
+            display_table = display_table.sort_values('% Related', ascending=False)
+            
+            # Create a styled table
+            col1, col2, col3 = st.columns([1, 3, 1])
+            with col2:
+                st.markdown("""
+                <div class="presentable-table">
+                    <div class="table-header">Program Employment Relatedness Analysis</div>
+                """, unsafe_allow_html=True)
+                
+                # Display the table with better formatting
+                st.dataframe(
+                    display_table,
+                    use_container_width=True,
+                    hide_index=True,
+                    column_config={
+                        "Program": st.column_config.TextColumn("Program", width="medium"),
+                        "Total Employed": st.column_config.NumberColumn("Total Employed", width="small"),
+                        "Related Jobs": st.column_config.NumberColumn("Related Jobs", width="small"),
+                        "Not Related Jobs": st.column_config.NumberColumn("Not Related Jobs", width="small"),
+                        "% Related": st.column_config.TextColumn("% Related", width="small")
+                    }
+                )
+                
+                st.markdown("</div>", unsafe_allow_html=True)
+            
+            # 🎯 3. Strategic Insights
+            st.markdown('<div class="subsection-header">🎯 Strategic Insights</div>', unsafe_allow_html=True)
+            
+            if len(program_df) > 0:
+                # Find programs with highest and lowest relatedness
+                highest_related = program_df.loc[program_df['% Related'].idxmax()]
+                lowest_related = program_df.loc[program_df['% Related'].idxmin()]
+                
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    if highest_related['% Related'] >= 80:
+                        st.markdown(f"""
+                        <div class="strategic-insight">
+                            <strong>🏆 Excellence in Alignment:</strong> {highest_related['Program']} program shows outstanding curriculum-job alignment with {highest_related['% Related']}% of graduates working in related fields. Consider this program as a benchmark for best practices.
+                        </div>
+                        """, unsafe_allow_html=True)
+                    elif highest_related['% Related'] >= 60:
+                        st.markdown(f"""
+                        <div class="story-card">
+                            <strong>✅ Strong Performance:</strong> {highest_related['Program']} program demonstrates good alignment with {highest_related['% Related']}% related employment. Continue supporting industry partnerships and curriculum development.
+                        </div>
+                        """, unsafe_allow_html=True)
+                
+                with col2:
+                    if lowest_related['% Related'] <= 30:
+                        st.markdown(f"""
+                        <div class="alert-card">
+                            <strong>⚠️ Attention Needed:</strong> {lowest_related['Program']} program shows low alignment ({lowest_related['% Related']}% related employment). Review curriculum relevance and career pathways for graduates.
+                        </div>
+                        """, unsafe_allow_html=True)
+                    elif lowest_related['% Related'] <= 50:
+                        st.markdown(f"""
+                        <div class="insight-highlight">
+                            <strong>📈 Improvement Opportunity:</strong> {lowest_related['Program']} program has moderate alignment ({lowest_related['% Related']}% related employment). Consider enhancing internship programs and industry networking.
+                        </div>
+                        """, unsafe_allow_html=True)
+                
+                # Overall insight
+                avg_relatedness = program_df['% Related'].mean()
+                if avg_relatedness >= 70:
+                    st.markdown(f"""
+                    <div class="strategic-insight">
+                        <strong>📊 Overall Strong Alignment:</strong> Average program relatedness is {avg_relatedness:.1f}%, indicating good curriculum-industry alignment across programs. Focus on maintaining and sharing best practices.
+                    </div>
+                    """, unsafe_allow_html=True)
+                elif avg_relatedness >= 50:
+                    st.markdown(f"""
+                    <div class="insight-highlight">
+                        <strong>📊 Moderate Alignment:</strong> Average program relatedness is {avg_relatedness:.1f}%. Opportunity to strengthen curriculum-industry connections through advisory boards and updated course content.
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown(f"""
+                    <div class="alert-card">
+                        <strong>📊 Improvement Needed:</strong> Average program relatedness is {avg_relatedness:.1f}%. Consider comprehensive curriculum review and stronger industry partnerships to improve graduate outcomes.
+                    </div>
+                    """, unsafe_allow_html=True)
+    
+    else:
+        st.info("""
+        **No employment data available for program-related analysis.** 
+        This could be because:
+        - No employed alumni match the current filters
+        - Curriculum relevance data is not yet collected
+        - Employment status information is incomplete
+        """)
+
 def create_strategic_kpi_metrics(dashboard, filtered_df):
     """Create KPI metrics following strategic design principles"""
     st.markdown('<div class="main-header">Alumify Strategic Dashboard</div>', unsafe_allow_html=True)
@@ -1214,6 +1406,9 @@ def main():
         
         # Add program comparison tables when 2+ programs are selected
         create_program_comparison_tables(dashboard, filtered_df, filters)
+        
+        # 🧭 NEW: Add Program-Related Employment Analysis
+        create_program_employment_analysis(dashboard, filtered_df)
         
         create_plotly_enhanced_visualizations(dashboard, filtered_df, filters)
         create_actionable_insights(dashboard, filtered_df)
