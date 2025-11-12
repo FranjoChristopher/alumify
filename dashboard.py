@@ -654,7 +654,7 @@ def create_program_comparison_tables(dashboard, filtered_df, filters):
 def create_program_employment_analysis(dashboard, filtered_df):
     """🧭 Create Program-Related Employment Analysis with Chart and Table in 2 columns"""
     
-    st.markdown('<div class="section-header">🧭 Program-Related Employment Analysis</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">Program-Related Employment Analysis</div>', unsafe_allow_html=True)
     
     # Filter only employed alumni for this analysis
     employed_df = filtered_df[filtered_df['is_employed'] == 'Yes']
