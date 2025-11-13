@@ -798,7 +798,7 @@ def create_program_employment_analysis(dashboard, filtered_df):
             st.markdown('<div class="subsection-header">Job Details Analysis</div>', unsafe_allow_html=True)
             
             # Create tabs for Related Jobs and Not Related Jobs
-            tab1, tab2 = st.tabs(["📊 Related Jobs", "📊 Not Related Jobs"])
+            tab1, tab2 = st.tabs(["Related Jobs", "Not Related Jobs"])
             
             with tab1:
                 # Related Jobs Details
