@@ -271,6 +271,22 @@ st.markdown("""
         background-color: #F0F9FF;
         font-weight: 600;
     }
+    
+    /* Job details styling */
+    .job-details-table {
+        font-size: 0.8rem;
+        margin: 0.5rem 0;
+    }
+    
+    .related-job {
+        background-color: #E8F5E8 !important;
+        border-left: 3px solid #10B981;
+    }
+    
+    .not-related-job {
+        background-color: #FFEBEE !important;
+        border-left: 3px solid #EF4444;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -652,7 +668,7 @@ def create_program_comparison_tables(dashboard, filtered_df, filters):
                 st.markdown("</div>", unsafe_allow_html=True)
 
 def create_program_employment_analysis(dashboard, filtered_df):
-    """🧭 Create Program-Related Employment Analysis with Chart and Table in 2 columns"""
+    """🧭 Create Program-Related Employment Analysis with Chart, Table, and Job Details"""
     
     st.markdown('<div class="section-header">Program-Related Employment Analysis</div>', unsafe_allow_html=True)
     
@@ -778,8 +794,70 @@ def create_program_employment_analysis(dashboard, filtered_df):
                 
                 st.markdown("</div>", unsafe_allow_html=True)
             
-            # 🎯 Strategic Insights (Full width below the two columns)
-            # st.markdown('<div class="subsection-header">Strategic Insights</div>', unsafe_allow_html=True)
+            # 🎯 Job Details Section - Show actual jobs for related and not related categories
+            st.markdown('<div class="subsection-header">Job Details Analysis</div>', unsafe_allow_html=True)
+            
+            # Create tabs for Related Jobs and Not Related Jobs
+            tab1, tab2 = st.tabs(["📊 Related Jobs", "📊 Not Related Jobs"])
+            
+            with tab1:
+                # Related Jobs Details
+                related_jobs_df = employed_df[
+                    (employed_df['curriculum_relevant'] == 'Yes') & 
+                    (employed_df['present_occupation'].notna()) &
+                    (employed_df['business_line'].notna())
+                ][['name', 'degree', 'present_occupation', 'business_line', 'place_of_work']].drop_duplicates()
+                
+                if not related_jobs_df.empty:
+                    st.markdown(f"**Showing {len(related_jobs_df)} alumni with jobs related to their program:**")
+                    
+                    # Display in a clean table
+                    related_display = related_jobs_df.rename(columns={
+                        'name': 'Alumni Name',
+                        'degree': 'Program',
+                        'present_occupation': 'Current Job',
+                        'business_line': 'Industry',
+                        'place_of_work': 'Work Location'
+                    })
+                    
+                    st.dataframe(
+                        related_display,
+                        use_container_width=True,
+                        hide_index=True
+                    )
+                else:
+                    st.info("No related job data available with current filters.")
+            
+            with tab2:
+                # Not Related Jobs Details
+                not_related_jobs_df = employed_df[
+                    (employed_df['curriculum_relevant'] == 'No') & 
+                    (employed_df['present_occupation'].notna()) &
+                    (employed_df['business_line'].notna())
+                ][['name', 'degree', 'present_occupation', 'business_line', 'place_of_work']].drop_duplicates()
+                
+                if not not_related_jobs_df.empty:
+                    st.markdown(f"**Showing {len(not_related_jobs_df)} alumni with jobs not related to their program:**")
+                    
+                    # Display in a clean table
+                    not_related_display = not_related_jobs_df.rename(columns={
+                        'name': 'Alumni Name',
+                        'degree': 'Program',
+                        'present_occupation': 'Current Job',
+                        'business_line': 'Industry',
+                        'place_of_work': 'Work Location'
+                    })
+                    
+                    st.dataframe(
+                        not_related_display,
+                        use_container_width=True,
+                        hide_index=True
+                    )
+                else:
+                    st.info("No unrelated job data available with current filters.")
+            
+            # 🎯 Strategic Insights (Full width below the job details)
+            st.markdown('<div class="subsection-header">Strategic Insights</div>', unsafe_allow_html=True)
             
             if len(program_df) > 0:
                 # Find programs with highest and lowest relatedness
