@@ -303,10 +303,10 @@ class AlumifyDashboard:
         """Create database connection"""
         try:
             conn = mysql.connector.connect(
-                host='ispsctagudin.info',
-                user='ispsctag_alumify25',
-                password='ispsctag.Alumify2025',
-                database='ispsctag_alumify25',
+                host='srv2050.hstgr.io',
+                user='u185173985_alumify2025',
+                password='Alumify..2025',
+                database='u185173985_alumify2025',
                 autocommit=True
             )
             return conn
