@@ -304,9 +304,9 @@ class AlumifyDashboard:
         try:
             conn = mysql.connector.connect(
                 host='ispsctagudin.info',
-                user='ispsctag_alumify',
+                user='ispsctag_alumify25',
                 password='ispsctag.Alumify2025',
-                database='ispsctag_alumify',
+                database='ispsctag_alumify25',
                 autocommit=True
             )
             return conn
